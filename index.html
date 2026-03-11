@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lattice | Multi-Color CSS Architect</title>
+    
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script type="text/javascript">
+        (function() {
+            // STEP 1: Public Key updated to F6_n12Iry0aRYGpvx
+            emailjs.init("F6_n12Iry0aRYGpvx");
+        })();
+    </script>
+
+    <style>
+        /* --- MULTI-COLOR PALETTE --- */
+        :root {
+            --primary-gradient: linear-gradient(135deg, #ff00cc 0%, #3333ff 100%);
+            --bg: #070b14;
+            --sidebar-bg: rgba(15, 23, 42, 0.95);
+            --text: #f8fafc;
+            --accent: #22d3ee;
+            --grid-line: rgba(255, 255, 255, 0.05);
+            --expanded-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --danger: #ef4444;
+        }
+
+        * { box-sizing: border-box; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            margin: 0;
+            background-color: var(--bg);
+            background-image: linear-gradient(var(--grid-line) 1px, transparent 1px), 
+                              linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+            background-size: 40px 40px;
+            color: var(--text);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 380px;
+            background: var(--sidebar-bg);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(255,255,255,0.1);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+            overflow-y: auto;
+            box-shadow: 20px 0 50px rgba(0,0,0,0.5);
+            position: relative;
+            z-index: 1000;
+        }
+
+        .logo-area h2 { 
+            margin: 0; 
+            font-size: 1.8rem; 
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+            font-weight: 900;
+        }
+
+        .hint { font-size: 0.75rem; color: var(--accent); opacity: 0.8; margin-top: auto; padding-top: 10px; }
+
+        .control-group { display: flex; flex-direction: column; gap: 0.4rem; }
+        label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; }
+
+        input, select {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 0.8rem;
+            border-radius: 10px;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        input:focus { border-color: var(--accent); outline: none; }
+
+        .main-content {
+            flex: 1;
+            padding: 4rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+        }
+
+        .grid-container {
+            display: grid;
+            width: 100%;
+            height: 100%;
+            max-width: 900px;
+            max-height: 700px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 15px;
+            grid-template-columns: repeat(var(--cols), 1fr);
+            grid-template-rows: repeat(var(--rows), 1fr);
+            gap: var(--gap);
+            justify-items: var(--justify);
+            align-items: var(--align);
+        }
+
+        .grid-item {
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #000;
+            font-weight: 800;
+        }
+
+        .grid-item.expanded {
+            background: var(--expanded-gradient) !important;
+            color: var(--bg);
+            border-color: white;
+        }
+
+        .code-box {
+            background: #020617;
+            padding: 1.2rem;
+            border-radius: 12px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.75rem;
+            border: 1px solid rgba(255,255,255,0.05);
+            line-height: 1.6;
+            max-height: 200px;
+            overflow-y: auto;
+            white-space: pre;
+        }
+
+        .code-keyword { color: #f472b6; }
+        .code-prop { color: #22d3ee; }
+        .code-val { color: #fbbf24; }
+
+        .button-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        
+        .btn {
+            padding: 0.8rem;
+            border-radius: 10px;
+            font-weight: 800;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            border: none;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+        }
+
+        #copy-btn { background: var(--primary-gradient); }
+        #save-btn { background: #334155; }
+        #mail-btn { background: #4f46e5; flex: 1; }
+        #download-btn { background: #10b981; flex: 1; }
+        #history-toggle { background: #1e293b; width: 100%; border: 1px solid var(--accent); color: var(--accent); margin-top: 10px;}
+        
+        .btn:active { transform: scale(0.95); }
+        .btn:hover { filter: brightness(1.2); }
+
+        /* HISTORY PANEL */
+        #history-panel {
+            position: fixed;
+            left: 400px;
+            top: 2rem;
+            width: 320px;
+            background: var(--sidebar-bg);
+            backdrop-filter: blur(30px);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 20px;
+            padding: 1.5rem;
+            z-index: 2000;
+            display: none;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+        }
+
+        .history-item {
+            background: rgba(255,255,255,0.05);
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: 0.3s;
+        }
+
+        .history-item:hover { border-color: var(--accent); background: rgba(255,255,255,0.1); }
+        .history-item strong { color: var(--accent); }
+
+        .clear-btn {
+            background: transparent;
+            color: var(--danger);
+            border: 1px solid var(--danger);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.6rem;
+            cursor: pointer;
+        }
+        .clear-btn:hover { background: var(--danger); color: white; }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="logo-area">
+            <h2>Lattice</h2>
+        </div>
+        
+        <div class="control-group">
+            <label>Grid Columns</label>
+            <input type="number" id="cols" value="4" min="1" max="10">
+        </div>
+
+        <div class="control-group">
+            <label>Grid Rows</label>
+            <input type="number" id="rows" value="4" min="1" max="10">
+        </div>
+
+        <div class="control-group">
+            <label>Gutter Size: <span id="gap-label">20px</span></label>
+            <input type="range" id="gap" min="0" max="100" value="20">
+        </div>
+
+        <div class="control-group">
+            <label>Alignment</label>
+            <select id="justify">
+                <option value="stretch">Stretch Content</option>
+                <option value="center">Center Center</option>
+                <option value="start">Align Start</option>
+                <option value="end">Align End</option>
+            </select>
+        </div>
+
+        <div class="code-box" id="code-container"></div>
+
+        <div class="button-row">
+            <button id="copy-btn" class="btn">Copy CSS</button>
+            <button id="save-btn" class="btn">Save Layout</button>
+        </div>
+
+        <div class="control-group" style="margin-top: 5px;">
+            <label>Export Options</label>
+            <input type="email" id="email-address" placeholder="recipient@mail.com">
+            <div style="display:flex; gap:10px; margin-top:5px;">
+                <button id="mail-btn" class="btn">Email</button>
+                <button id="download-btn" class="btn">Download</button>
+            </div>
+        </div>
+        
+        <button id="history-toggle" class="btn">View History</button>
+
+        <p class="hint">Click titles to expand them!</p>
+    </aside>
+
+    <div id="history-panel">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1rem;">
+            <h3 style="margin:0; font-size: 1rem; color: var(--accent);">History</h3>
+            <div>
+                <button id="clear-history" class="clear-btn">Clear All</button>
+                <span id="close-history" style="cursor:pointer; opacity:0.5; margin-left:10px;">✕</span>
+            </div>
+        </div>
+        <div id="history-list"></div>
+    </div>
+
+    <main class="main-content">
+        <div id="grid-canvas" class="grid-container"></div>
+    </main>
+
+    <script>
+        const canvas = document.getElementById('grid-canvas');
+        const codeContainer = document.getElementById('code-container');
+        const gapLabel = document.getElementById('gap-label');
+        const historyList = document.getElementById('history-list');
+        const historyPanel = document.getElementById('history-panel');
+        
+        const controls = {
+            cols: document.getElementById('cols'),
+            rows: document.getElementById('rows'),
+            gap: document.getElementById('gap'),
+            justify: document.getElementById('justify')
+        };
+
+        const gradients = [
+            'linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%)',
+            'linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%)',
+            'linear-gradient(135deg, #d4fc79 0%, #96e6a1 100%)',
+            'linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)',
+            'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+            'linear-gradient(135deg, #cd9cf2 0%, #f6f3ff 100%)'
+        ];
+
+        let itemStates = {};
+
+        function updateUI() {
+            const c = controls.cols.value;
+            const r = controls.rows.value;
+            const g = controls.gap.value + 'px';
+            const j = controls.justify.value;
+
+            canvas.style.setProperty('--cols', c);
+            canvas.style.setProperty('--rows', r);
+            canvas.style.setProperty('--gap', g);
+            canvas.style.setProperty('--justify', j);
+            canvas.style.setProperty('--align', j);
+
+            gapLabel.innerText = g;
+            canvas.innerHTML = '';
+
+            for (let i = 1; i <= (c * r); i++) {
+                const div = document.createElement('div');
+                div.className = 'grid-item';
+                div.style.background = gradients[i % gradients.length];
+
+                if(itemStates[i]) {
+                    div.classList.add('expanded');
+                    div.style.gridColumn = `span ${itemStates[i].colSpan}`;
+                    div.style.gridRow = `span ${itemStates[i].rowSpan}`;
+                }
+
+                div.innerHTML = `<span>${i}</span>`;
+                div.onclick = () => {
+                    if(!itemStates[i]) itemStates[i] = { colSpan: 2, rowSpan: 1 };
+                    else if (itemStates[i].colSpan === 2) itemStates[i] = { colSpan: 1, rowSpan: 2 };
+                    else delete itemStates[i];
+                    updateUI();
+                };
+                canvas.appendChild(div);
+            }
+            generateCode(c, r, g, j);
+        }
+
+        function generateCode(c, r, g, j) {
+            let itemCss = "";
+            Object.keys(itemStates).forEach(id => {
+                itemCss += `\n.item-${id} {\n  grid-column: span ${itemStates[id].colSpan};\n  grid-row: span ${itemStates[id].rowSpan};\n}`;
+            });
+
+            codeContainer.innerHTML = `<span class="code-keyword">.container</span> {
+  <span class="code-prop">display</span>: grid;
+  <span class="code-prop">grid-template-columns</span>: <span class="code-val">repeat(${c}, 1fr)</span>;
+  <span class="code-prop">grid-template-rows</span>: <span class="code-val">repeat(${r}, 1fr)</span>;
+  <span class="code-prop">gap</span>: <span class="code-val">${g}</span>;
+  <span class="code-prop">place-items</span>: <span class="code-val">${j}</span>;
+}${itemCss}`;
+        }
+
+        document.getElementById('copy-btn').addEventListener('click', function() {
+            const textToCopy = codeContainer.textContent;
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                const originalText = this.innerText;
+                this.innerText = "COPIED!";
+                setTimeout(() => this.innerText = originalText, 1500);
+            });
+        });
+
+        document.getElementById('download-btn').addEventListener('click', function() {
+            const text = codeContainer.textContent;
+            const element = document.createElement('a');
+            element.setAttribute('href', 'data:text/css;charset=utf-8,' + encodeURIComponent(text));
+            element.setAttribute('download', 'lattice-style.css');
+            element.style.display = 'none';
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+        });
+
+        // --- EMAILJS INTEGRATION ---
+        document.getElementById('mail-btn').addEventListener('click', function() {
+            const email = document.getElementById('email-address').value.trim();
+            const text = codeContainer.textContent;
+            const btn = this;
+
+            if(!email) {
+                alert("Please enter a recipient email address.");
+                return;
+            }
+
+            btn.innerText = "SENDING...";
+            btn.disabled = true;
+
+            const templateParams = {
+                to_email: email,
+                css_code: text
+            };
+
+            // STEP 2: IDs Updated as per your request
+            emailjs.send('service_z3m9wjn', 'template_mfb3n9c', templateParams)
+                .then(function(response) {
+                   btn.innerText = "SENT!";
+                   setTimeout(() => { btn.innerText = "EMAIL"; btn.disabled = false; }, 2000);
+                }, function(error) {
+                   console.error('FAILED...', error);
+                   alert("Email failed. Ensure IDs are correct and your EmailJS quota isn't empty.");
+                   btn.innerText = "ERROR";
+                   btn.disabled = false;
+                });
+        });
+
+        function saveLayout() {
+            const layout = {
+                cols: controls.cols.value,
+                rows: controls.rows.value,
+                gap: controls.gap.value,
+                justify: controls.justify.value,
+                items: JSON.parse(JSON.stringify(itemStates)),
+                time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+            };
+            let history = JSON.parse(localStorage.getItem('lattice_history') || '[]');
+            history.unshift(layout);
+            localStorage.setItem('lattice_history', JSON.stringify(history.slice(0, 10)));
+            renderHistory();
+        }
+
+        function renderHistory() {
+            let history = JSON.parse(localStorage.getItem('lattice_history') || '[]');
+            historyList.innerHTML = history.length ? '' : '<p style="font-size:0.7rem; opacity:0.5;">No saved layouts found.</p>';
+            history.forEach((h, idx) => {
+                const item = document.createElement('div');
+                item.className = 'history-item';
+                item.innerHTML = `<strong>${h.time}</strong> — ${h.cols}x${h.rows} Grid<br>Gap: ${h.gap}px`;
+                item.onclick = () => {
+                    controls.cols.value = h.cols;
+                    controls.rows.value = h.rows;
+                    controls.gap.value = h.gap;
+                    controls.justify.value = h.justify;
+                    itemStates = h.items;
+                    updateUI();
+                };
+                historyList.appendChild(item);
+            });
+        }
+
+        document.getElementById('clear-history').addEventListener('click', () => {
+            if(confirm("Are you sure you want to clear your entire history?")) {
+                localStorage.removeItem('lattice_history');
+                renderHistory();
+            }
+        });
+
+        document.getElementById('save-btn').addEventListener('click', () => {
+            saveLayout();
+            const btn = document.getElementById('save-btn');
+            btn.innerText = "SAVED!";
+            setTimeout(() => btn.innerText = "SAVE LAYOUT", 1000);
+        });
+
+        document.getElementById('history-toggle').addEventListener('click', (e) => {
+            e.stopPropagation();
+            historyPanel.style.display = (historyPanel.style.display === 'block') ? 'none' : 'block';
+            renderHistory();
+        });
+
+        document.getElementById('close-history').onclick = () => historyPanel.style.display = 'none';
+
+        window.onclick = (e) => {
+            if (!historyPanel.contains(e.target) && e.target !== document.getElementById('history-toggle')) {
+                historyPanel.style.display = 'none';
+            }
+        };
+
+        Object.values(controls).forEach(el => el.addEventListener('input', updateUI));
+        
+        renderHistory();
+        updateUI();
+    </script>
+</body>
+</html>
